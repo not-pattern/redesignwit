@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WIT Innovación y Tecnología</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: un viaje vertical de día a noche. Secciones a sangre que se tapan unas a otras,
+   un tramo horizontal de cinco "paradas" y una llegada nocturna. Solo navy y blanco, el azul señal se reserva para estados. */
+:root{
+  --navy:#0E2240;
+  --ink:#0A1730;
+  --night:#060E1C;
+  --paper:#F2F5F9;
+  --mist:#D9E3EE;
+  --steel:#5A6E89;
+  --white:#FFFFFF;
+  --signal:#2F6BE0;
+  --line:rgba(14,34,64,.14);
+  --line-inv:rgba(255,255,255,.16);
+
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+
+  --t-hero:clamp(2.1rem,min(5.6vw,8.2vh),5.4rem);
+  --t-h2:clamp(2.1rem,4.4vw,4.2rem);
+  --t-h3:clamp(1.75rem,2.9vw,2.9rem);
+  --t-num:clamp(1.55rem,2.2vw,2.3rem);
+  --t-body:clamp(1rem,.96rem + .2vw,1.125rem);
+  --t-label:.72rem;
+
+  --gl:max(clamp(16px,5vw,72px),env(safe-area-inset-left,0px));
+  --gr:max(clamp(16px,5vw,72px),env(safe-area-inset-right,0px));
+  --nav-h:76px;
+  --ease:cubic-bezier(.22,.7,.2,1);
+  color-scheme:light;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{overflow-x:clip;background:var(--night)}
+body{margin:0;overflow-x:clip;background:var(--paper);color:var(--navy);font-family:var(--f-body);font-size:var(--t-body);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--night)}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+h1,h2,h3{font-family:var(--f-display);font-weight:300;font-stretch:112%;letter-spacing:-.022em;line-height:1.02;margin:0;text-wrap:balance}
+p{margin:0}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+
+.wrap{padding-left:var(--gl);padding-right:var(--gr);width:100%;max-width:1520px;margin-inline:auto}
+.label{font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.16em;text-transform:uppercase;font-weight:500}
+.chip{display:inline-flex;align-items:center;gap:.6em;font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.16em;text-transform:uppercase;padding:.5em .9em;border:1px solid currentColor;border-radius:999px;line-height:1}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.lede{max-width:52ch;color:inherit;opacity:.82}
+
+/* ---------- Botones ---------- */
+.btn{--bfg:var(--white);--bbg:var(--navy);display:inline-flex;align-items:center;gap:.8em;font-family:var(--f-display);font-stretch:118%;font-weight:650;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;padding:1.15em 1.7em;border:1px solid var(--bbg);background:var(--bbg);color:var(--bfg);transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease)}
+.btn svg{width:1.1em;height:1.1em;transition:transform .35s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn--ghost{background:transparent;color:var(--navy);border-color:rgba(14,34,64,.4)}
+.btn--ghost:hover{border-color:var(--navy);background:var(--navy);color:var(--white)}
+.btn:not(.btn--ghost):hover{background:transparent;color:var(--bbg)}
+.btn--light{--bfg:var(--navy);--bbg:var(--white)}
+
+/* ---------- Navegación ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);--nfg:var(--navy);--niso:var(--white);transition:background .5s var(--ease),color .5s}
+.nav__in{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:24px;padding-left:var(--gl);padding-right:var(--gr)}
+.nav__iso{display:block;flex:none;width:30px;color:var(--niso);transition:color .5s}
+.nav__iso svg{width:100%;height:auto;display:block}
+.nav__links{display:flex;gap:clamp(16px,1.9vw,40px);list-style:none;margin:0;padding:0}
+.nav nav{min-width:0;display:flex;justify-content:flex-end}
+.nav__links a{position:relative;display:block;padding:8px 0;font-family:var(--f-display);font-stretch:112%;font-weight:700;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;color:var(--nfg);transition:color .5s,opacity .3s;white-space:nowrap}
+.nav__links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--signal);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease)}
+.nav__links a:hover::after,.nav__links a.is-active::after{transform:scaleX(1)}
+.nav--light{--niso:var(--navy)}
+.nav--solid{--niso:var(--navy)}
+.nav--dark{--nfg:var(--white);--niso:var(--white)}
+.nav--solid{background:rgba(242,245,249,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.nav--dark.nav--solid{background:rgba(6,14,28,.6);--niso:var(--white)}
+.nav__menu{display:none;align-items:center;gap:10px;background:none;border:0;color:var(--nfg);font-family:var(--f-mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:10px 0}
+.nav__menu i{display:block;width:22px;height:8px;border-top:1.5px solid currentColor;border-bottom:1.5px solid currentColor}
+@media (max-width:1180px){.nav__links{display:none}.nav__menu{display:flex}}
+.nav--compact .nav__links{display:none}.nav--compact .nav__menu{display:flex}
+
+.sheet{position:fixed;inset:0;z-index:70;background:var(--night);color:var(--white);display:flex;flex-direction:column;padding-top:calc(env(safe-area-inset-top,0px) + 18px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 28px);padding-left:var(--gl);padding-right:var(--gr)}
+.sheet__top{display:flex;justify-content:space-between;align-items:center;height:58px}
+.sheet__close{background:none;border:0;color:inherit;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:10px 0}
+.sheet ol{list-style:none;margin:auto 0;padding:0;display:grid;gap:4px;counter-reset:s}
+.sheet li a{display:flex;align-items:baseline;gap:18px;text-decoration:none;font-family:var(--f-display);font-weight:300;font-stretch:115%;font-size:clamp(1.7rem,7vw,2.6rem);line-height:1.25}
+.sheet li a::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;opacity:.5}
+.sheet__foot{display:grid;gap:4px;font-family:var(--f-mono);font-size:.8rem;opacity:.7}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;height:100vh;height:100svh;min-height:440px;overflow:hidden;background:#7d9cc8}
+.hero__media{position:absolute;inset:0}
+.hero__media img{width:100%;height:100%;object-fit:cover;object-position:50% 70%;transform-origin:50% 80%}
+.hero__logo{position:absolute;left:50%;top:44%;width:clamp(210px,22vw,370px);transform:translate(-50%,-50%);color:var(--white);filter:drop-shadow(0 2px 30px rgba(14,34,64,.18))}
+.hero__logo svg{width:100%;height:auto;display:block}
+.hero__copy{position:absolute;left:auto;right:0;width:min(54%,760px);top:var(--nav-h);bottom:calc(44px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:clamp(12px,2.6vh,22px);padding-left:0;padding-block:2vh 4vh}
+@media (max-height:720px){.hero__copy .lede{font-size:.95rem;line-height:1.5}.hero__ctas{margin-top:0}}
+.hero .btn--ghost{background:rgba(242,245,249,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-color:rgba(14,34,64,.25)}
+.hero__copy h1{font-size:var(--t-hero);max-width:13ch;color:var(--navy)}
+.hero__copy .lede{color:var(--navy);opacity:.88;max-width:46ch}
+.hero__ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.hero__cue{position:absolute;left:50%;bottom:76px;width:1px;height:56px;background:rgba(255,255,255,.35);overflow:hidden}
+.hero__cue::after{content:"";position:absolute;inset:0;background:var(--white);transform:translateY(-100%);animation:cue 2.4s var(--ease) infinite}
+@keyframes cue{0%{transform:translateY(-100%)}55%{transform:translateY(0)}100%{transform:translateY(100%)}}
+
+/* Huincha de telemetría */
+.ticker{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:stretch;background:rgba(6,14,28,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--white);font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;height:44px;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box}
+.ticker__tag{flex:none;display:flex;align-items:center;gap:10px;padding-left:var(--gl);padding-right:22px;border-right:1px solid var(--line-inv);white-space:nowrap}
+.ticker__tag b{font-weight:500}
+.ticker__tag span{opacity:.55}
+.dot{width:7px;height:7px;border-radius:50%;background:#5BD38D;box-shadow:0 0 0 0 rgba(91,211,141,.6);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(91,211,141,0)}100%{box-shadow:0 0 0 0 rgba(91,211,141,0)}}
+.ticker__track{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.ticker__run{display:flex;flex:none;gap:56px;padding-right:56px;animation:run 38s linear infinite;white-space:nowrap}
+.ticker.is-paused .ticker__run{animation-play-state:paused}
+.ticker__run li{display:flex;gap:10px;align-items:baseline}
+.ticker__run ul{display:flex;gap:56px;list-style:none;margin:0;padding:0}
+.ticker__run strong{font-weight:500;font-variant-numeric:tabular-nums}
+.ticker__run em{font-style:normal;opacity:.55}
+@keyframes run{to{transform:translateX(-50%)}}
+.ticker__btn{flex:none;width:52px;border:0;border-left:1px solid var(--line-inv);background:none;color:inherit;cursor:pointer;display:grid;place-items:center;margin-right:env(safe-area-inset-right,0px)}
+.ticker__btn svg{width:14px;height:14px}
+
+/* ---------- Sobre nosotros ---------- */
+.about{position:relative;overflow:hidden;background:var(--paper);min-height:150vh;display:flex;flex-direction:column}
+.about__bg{position:absolute;inset:-12% 0 0;z-index:0}
+.about__bg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+.about__bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--paper) 0%,rgba(242,245,249,.6) 14%,rgba(242,245,249,0) 34%,rgba(6,14,28,0) 62%,rgba(6,14,28,.55) 100%)}
+.about__top{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr);align-items:start;padding-block:clamp(120px,18vh,200px) 40px}
+.about__text{display:grid;gap:28px}
+.about__text{max-width:1100px}
+.about__text h2{font-size:clamp(2.6rem,6vw,5.8rem);max-width:15ch;line-height:.98}
+.about__bottom{position:relative;z-index:1;margin-top:auto;padding-block:40px clamp(56px,10vh,110px);color:var(--white);display:grid;grid-template-columns:auto 1fr 1fr;gap:clamp(28px,5vw,96px);align-items:end}
+.years{display:flex;align-items:flex-end;gap:16px}
+.years b{font-family:var(--f-display);font-weight:200;font-stretch:125%;font-size:clamp(5rem,13vw,11rem);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.years span{padding-bottom:.6em;line-height:1.5}
+.trait{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;padding-top:20px;border-top:1px solid var(--line-inv)}
+.trait svg{width:28px;height:28px}
+.trait h3{font-size:1.35rem;font-stretch:115%;font-weight:400;letter-spacing:0;margin-bottom:4px}
+.trait p{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;opacity:.72}
+
+/* ---------- Soluciones: ventana ---------- */
+.window{position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:var(--paper)}
+.window__media{position:absolute;inset:0;overflow:hidden}
+.window__media img{width:100%;height:100%;object-fit:cover;object-position:50% 62%}
+.window__media::after{content:"";position:absolute;inset:0;background:linear-gradient(95deg,rgba(242,245,249,.88) 0%,rgba(242,245,249,.6) 34%,rgba(242,245,249,0) 62%)}
+.window__copy{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:26px}
+.window__copy h2{font-size:var(--t-h2);max-width:12ch}
+.window__copy .lede{max-width:44ch}
+.window__copy .chip{align-self:flex-start}
+.window--right .window__media::after{background:linear-gradient(265deg,rgba(242,245,249,.92) 0%,rgba(242,245,249,.78) 38%,rgba(242,245,249,0) 62%)}
+.window--right .window__copy{padding-left:max(52%,var(--gl))}
+.window--right .window__media img{object-position:40% 55%}
+
+/* ---------- Paradas ---------- */
+.stops{position:relative;background:var(--paper);overflow:hidden}
+.stops__bar{position:absolute;top:var(--nav-h);left:0;width:51.9vw;z-index:4;display:flex;align-items:center;gap:28px;padding-left:var(--gl);padding-right:var(--gr);height:56px;pointer-events:none}
+.stops__count{font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--white);text-shadow:0 1px 12px rgba(6,14,28,.4)}
+.route{position:relative;flex:1;height:14px;max-width:520px}
+.route::before,.route__fill{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.45)}
+.route__fill{background:var(--white);transform-origin:left;transform:scaleX(0)}
+.route__stop{position:absolute;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;border:1px solid var(--white);background:rgba(6,14,28,.4);transition:background .4s}
+.route__stop.is-on{background:var(--white)}
+.stops__track{display:flex;width:max-content}
+.stop{position:relative;width:100vw;height:100vh;height:100svh;min-height:600px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);flex:none}
+.stop__media{position:relative;overflow:hidden;background:var(--mist)}
+.stop__media img{position:absolute;top:0;left:-9%;width:118%;max-width:none;height:100%;object-fit:cover}
+.stop__media::after{content:"";position:absolute;inset:0 0 auto;height:180px;background:linear-gradient(180deg,rgba(6,14,28,.45),transparent)}
+.stop__body{display:flex;flex-direction:column;justify-content:center;gap:26px;padding:calc(var(--nav-h) + 40px) var(--gr) 48px clamp(28px,5vw,88px);min-width:0}
+.stop__tags{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--steel)}
+.stop__tags span+span::before{content:"/";margin-right:18px;opacity:.5}
+.stop__body h3{font-size:var(--t-h3);max-width:14ch}
+.stop__body p.desc{max-width:44ch;color:var(--steel)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.metric{padding:18px 18px 18px 0;display:grid;gap:6px}
+.metric+.metric{padding-left:18px;border-left:1px solid var(--line)}
+.metric dt{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+.metric dd{margin:0;font-family:var(--f-display);font-stretch:110%;font-weight:350;font-size:var(--t-num);line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.metric dd small{font-size:.42em;font-weight:500;letter-spacing:.02em;margin-left:.2em;font-stretch:100%}
+.stop__foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;align-items:center}
+.stop__foot .label{color:var(--steel)}
+.more{font-family:var(--f-display);font-stretch:120%;font-weight:650;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;display:inline-flex;gap:10px;align-items:center;border-bottom:1px solid currentColor;padding-bottom:4px}
+.more svg{width:14px;height:14px;transition:transform .35s var(--ease)}
+.more:hover svg{transform:translateX(4px)}
+.chat{display:grid;gap:10px;max-width:440px;font-size:.95rem}
+.chat__msg{padding:12px 16px;line-height:1.45}
+.chat__msg--q{justify-self:start;background:var(--white);border:1px solid var(--line);border-radius:14px 14px 14px 2px}
+.chat__msg--a{justify-self:end;background:var(--navy);color:var(--white);border-radius:14px 14px 2px 14px;display:flex;gap:10px}
+.chat__msg--a svg{flex:none;width:16px;height:16px;margin-top:3px;opacity:.8}
+.typing{justify-self:end;display:none;gap:4px;padding:14px 16px;background:var(--navy);border-radius:14px 14px 2px 14px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--white);opacity:.4;animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{50%{opacity:1}}
+
+/* ---------- Atardecer + Gemelo digital ---------- */
+.dusk{position:relative;background:var(--night);color:var(--white)}
+.dusk__sky{position:relative;height:120vh;overflow:hidden}
+.dusk__sky img{position:absolute;inset:-10% 0 0;width:100%;height:110%;object-fit:cover;object-position:50% 60%}
+.dusk__veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,14,28,.05) 0%,rgba(6,14,28,.35) 45%,var(--night) 100%)}
+.dusk__shade{position:absolute;inset:0;background:var(--night);opacity:.25}
+.dusk__head{position:absolute;left:0;right:0;bottom:12vh;display:grid;gap:24px}
+.dusk__head h2{font-size:var(--t-h2);max-width:13ch}
+.dusk__head .chip{justify-self:start}
+.twin{position:relative;min-height:100vh;display:flex;align-items:center;padding-block:calc(var(--nav-h) + 20px) 40px}
+.twin__grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr);gap:clamp(28px,5vw,90px);align-items:center}
+.twin__side{display:grid;gap:28px;align-content:center}
+.twin__mode{display:flex;gap:12px;align-items:flex-start;color:rgba(255,255,255,.7);font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;line-height:1.7;text-transform:uppercase}
+.twin__mode b{color:var(--white);font-weight:500}
+.twin__mode .dot{margin-top:6px;flex:none}
+.card{border:1px solid var(--line-inv);padding:24px;display:grid;gap:14px;background:rgba(255,255,255,.03)}
+.card__head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:baseline}
+.card h3{font-size:1.9rem;font-stretch:115%}
+.card .count{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;padding:.45em .7em;border:1px solid var(--line-inv)}
+.card p{color:rgba(255,255,255,.78)}
+.card .sla{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#7FE0A6}
+.card .coord{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;color:rgba(255,255,255,.5)}
+.twin__stats{display:flex;flex-wrap:wrap;gap:10px 28px;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);padding-top:18px;border-top:1px solid var(--line-inv)}
+.twin__stats b{color:var(--white);font-weight:500;font-variant-numeric:tabular-nums}
+.twin__hint{font-size:.9rem;color:rgba(255,255,255,.6)}
+.map{position:relative;width:min(100%,640px,calc((100vh - var(--nav-h) - 72px) * .9116));justify-self:end;aspect-ratio:784/860}
+.map canvas,.map svg{position:absolute;inset:0;width:100%;height:100%}
+.map .grat{stroke:rgba(255,255,255,.07);stroke-width:1}
+.map .grat-l{fill:rgba(255,255,255,.32);font-family:var(--f-mono);font-size:11px;letter-spacing:.08em}
+.map .rt{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.2;stroke-dasharray:2 5}
+.map .rt.is-sel{stroke:var(--white);stroke-dasharray:none;stroke-width:1.4}
+.node{cursor:pointer;outline:none}
+.node .halo{fill:rgba(255,255,255,.08);stroke:rgba(255,255,255,.35);stroke-width:1;transition:r .4s}
+.node .core{fill:var(--white)}
+.node text{fill:var(--white);font-family:var(--f-mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.node text.sub{fill:rgba(255,255,255,.55);font-size:10.5px;letter-spacing:.06em;text-transform:none}
+.node.is-sel .halo{fill:rgba(47,107,224,.3);stroke:var(--white)}
+.node:focus-visible .halo{stroke:var(--signal);stroke-width:2.5}
+.node .pulse{fill:none;stroke:var(--white);stroke-width:1;opacity:0}
+.node.is-sel .pulse{animation:pulse 2.2s infinite}
+@keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(3)}}
+.node .pulse{transform-box:fill-box;transform-origin:center}
+
+/* ---------- Clientes ---------- */
+.clients{background:var(--night);color:var(--white);padding-block:clamp(40px,8vh,90px) clamp(70px,12vh,130px);overflow:hidden}
+.clients__head{display:flex;justify-content:space-between;gap:20px;align-items:baseline;margin-bottom:clamp(28px,5vh,56px);border-top:1px solid var(--line-inv);padding-top:24px}
+.clients__head .label{opacity:.7}
+.marq{display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marq__run{display:flex;flex:none;gap:clamp(40px,6vw,96px);padding-right:clamp(40px,6vw,96px);animation:run 46s linear infinite}
+.marq__run ul{display:flex;gap:clamp(40px,6vw,96px);list-style:none;margin:0;padding:0}
+.marq:hover .marq__run{animation-play-state:paused}
+.marq__run li{font-family:var(--f-display);font-weight:250;font-stretch:118%;font-size:clamp(2rem,4.4vw,4rem);letter-spacing:-.02em;white-space:nowrap;color:rgba(255,255,255,.42);transition:color .4s}
+.marq__run li:hover{color:var(--white)}
+.clients__note{margin-top:22px;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;color:rgba(255,255,255,.4)}
+
+/* ---------- CTA llegada ---------- */
+.arrive{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;background:var(--night);color:var(--white);display:flex;align-items:flex-end}
+.arrive__media{position:absolute;inset:-14% 0 0}
+.arrive__media img{width:100%;height:100%;object-fit:cover;object-position:50% 70%}
+.arrive__media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--night) 0%,rgba(6,14,28,.2) 28%,rgba(6,14,28,.15) 55%,rgba(6,14,28,.85) 100%)}
+.arrive__copy{position:relative;display:grid;gap:24px;padding-block:20vh clamp(70px,14vh,130px);justify-items:start}
+.arrive__copy h2{font-size:var(--t-h2);max-width:12ch}
+.arrive__copy .lede{max-width:40ch}
+
+/* ---------- Footer ---------- */
+.foot{background:var(--night);color:var(--white);padding-block:clamp(56px,10vh,96px) calc(28px + env(safe-area-inset-bottom,0px))}
+.foot__grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.6fr);gap:clamp(32px,5vw,80px);padding-bottom:56px;border-bottom:1px solid var(--line-inv)}
+.foot__brand{display:grid;gap:22px;align-content:start}
+.foot__brand svg{width:140px;height:auto;color:var(--white)}
+.foot__brand h2{font-size:1.4rem;font-stretch:115%;font-weight:400;letter-spacing:0}
+.foot__brand p{max-width:40ch;color:rgba(255,255,255,.66)}
+.foot h3{font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.16em;text-transform:uppercase;font-weight:500;font-stretch:100%;color:rgba(255,255,255,.5);margin-bottom:18px}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.foot li{display:grid;grid-template-columns:20px 1fr;gap:12px;color:rgba(255,255,255,.85)}
+.foot li svg{width:18px;height:18px;margin-top:3px;opacity:.6}
+.foot li a{text-decoration:none;border-bottom:1px solid rgba(255,255,255,.25)}
+.foot li a:hover{border-color:var(--white)}
+.foot .sel{user-select:all}
+.foot .legal li{display:block}
+.foot__base{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center;padding-top:24px;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.foot__base nav{display:flex;gap:22px}
+.foot__base a{text-decoration:none;display:inline-flex;gap:8px;align-items:center;color:rgba(255,255,255,.75)}
+.foot__base a:hover{color:var(--white)}
+.foot__base svg{width:15px;height:15px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:899px){
+  :root{--nav-h:64px}
+  .about{min-height:auto}
+  .about__top{grid-template-columns:1fr;padding-block:120px 32px}
+    .about__bottom{grid-template-columns:1fr;gap:22px;padding-top:42vh}
+  .about__bg::after{background:linear-gradient(180deg,var(--paper) 0%,rgba(242,245,249,.85) 30%,rgba(242,245,249,.2) 52%,rgba(6,14,28,.35) 70%,rgba(6,14,28,.85) 100%)}
+  .window__media::after{background:linear-gradient(180deg,rgba(242,245,249,.85) 0%,rgba(242,245,249,.55) 55%,rgba(242,245,249,0) 80%)}
+  .window__copy{justify-content:flex-start;padding-top:calc(var(--nav-h) + 48px)}
+  .window--right .window__copy{padding-left:var(--gl)}
+  .window--right .window__media::after{background:linear-gradient(180deg,rgba(242,245,249,.88) 0%,rgba(242,245,249,.6) 50%,rgba(242,245,249,0) 75%)}
+  .window--right .window__media img{object-position:30% 60%}
+  .stops__bar{display:none}
+  .stops__track{flex-direction:column;width:100%}
+  .stop{width:100%;height:auto;min-height:0;grid-template-columns:1fr}
+  .stop__media{aspect-ratio:4/3}
+  .stop__media img{top:-6%;left:0;width:100%;height:112%}
+  .stop__body{padding:36px var(--gr) 64px var(--gl)}
+  .metric{padding-right:12px}.metric+.metric{padding-left:12px}
+  .dusk__sky{height:90vh}
+  .twin{min-height:0;padding-block:24px 80px}
+  .map{width:100%}
+  .twin__grid{grid-template-columns:1fr}
+  .map{justify-self:center;order:-1}
+  .foot__grid{grid-template-columns:1fr}
+  .hero__copy{justify-content:flex-start;padding-top:3vh;left:0;width:100%;padding-left:var(--gl)}
+  .ticker__tag span{display:none}
+}
+@media (max-width:520px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .metric:nth-child(3){grid-column:1/-1;border-left:0;padding-left:0;border-top:1px solid var(--line)}
+  .years b{font-size:5.5rem}
+  .node text.sub{display:none}
+}
+
+/* Movimiento reducido o sin JS: todo queda visible y quieto */
+.static .hero__logo{top:auto;bottom:120px;width:150px}
+.static .hero__cue{display:none}
+@media (prefers-reduced-motion:reduce){
+  .ticker__run,.marq__run,.hero__cue::after,.dot,.typing i,.node.is-sel .pulse{animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav__in">
+    <a class="nav__iso" href="#inicio" data-goto="inicio" aria-label="WIT, volver al inicio">
+      <svg viewBox="0 0 400 450" fill="none" stroke="currentColor" stroke-width="52" stroke-linecap="round" aria-hidden="true"><path d="M105.2 104.1A174 174 0 1 0 294.8 104.1"/><path d="M200 33V181"/></svg>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav__links">
+        <li><a href="#inicio" data-goto="inicio" data-link="inicio" class="is-active" aria-current="page">Inicio</a></li>
+        <li><a href="#soluciones" data-goto="soluciones" data-link="soluciones">Soluciones</a></li>
+        <li><a href="#nosotros" data-goto="nosotros" data-link="nosotros">Acerca de Wit</a></li>
+        <li><a href="asistente.html" data-link="asistente">Asistente Virtual</a></li>
+        <li><a href="#go-movie" data-goto="go-movie" data-link="go-movie">Go Movie</a></li>
+        <li><a href="#live-gps" data-goto="live-gps" data-link="live-gps">Live GPS</a></li>
+        <li><a href="#proyectos" data-goto="proyectos" data-link="proyectos">Proyectos</a></li>
+        <li><a href="#urban-wifi" data-goto="urban-wifi" data-link="urban-wifi">Urban WiFi</a></li>
+        <li><a href="#contactanos" data-goto="contactanos" data-link="contactanos">Contáctanos</a></li>
+      </ul>
+    </nav>
+    <button class="nav__menu" id="menuBtn" aria-expanded="false" aria-controls="sheet"><i></i>Menú</button>
+  </div>
+</header>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__top">
+    <span class="nav__iso" style="--niso:#fff"><svg viewBox="0 0 400 450" fill="none" stroke="currentColor" stroke-width="52" stroke-linecap="round" aria-hidden="true"><path d="M105.2 104.1A174 174 0 1 0 294.8 104.1"/><path d="M200 33V181"/></svg></span>
+    <button class="sheet__close" id="sheetClose">Cerrar</button>
+  </div>
+  <ol>
+    <li><a href="#inicio" data-goto="inicio">Inicio</a></li>
+    <li><a href="#soluciones" data-goto="soluciones">Soluciones</a></li>
+    <li><a href="#nosotros" data-goto="nosotros">Acerca de Wit</a></li>
+    <li><a href="asistente.html">Asistente Virtual</a></li>
+    <li><a href="#go-movie" data-goto="go-movie">Go Movie</a></li>
+    <li><a href="#live-gps" data-goto="live-gps">Live GPS</a></li>
+    <li><a href="#proyectos" data-goto="proyectos">Proyectos</a></li>
+    <li><a href="#urban-wifi" data-goto="urban-wifi">Urban WiFi</a></li>
+    <li><a href="#contactanos" data-goto="contactanos">Contáctanos</a></li>
+  </ol>
+  <div class="sheet__foot"><span>+56 9 9848 1845</span><span>contacto@wit.la</span></div>
+</div>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio" data-nav="hero">
+  <div class="hero__media">
+    <picture>
+      <source media="(max-width:700px) and (orientation:portrait)" srcset="assets/10-vertical-bus.jpg">
+      <img src="assets/hero.jpg" alt="Bus de pasajeros cruzando un viaducto con la ciudad, la bahía y la cordillera al fondo" fetchpriority="high">
+    </picture>
+  </div>
+
+  <div class="hero__logo" role="img" aria-label="WIT">
+    <svg viewBox="390 118 1390 480" aria-hidden="true"><g transform="translate(397 124) scale(1.04)" fill="none" stroke="currentColor" stroke-width="52" stroke-linecap="round"><path d="M105.2 104.1A174 174 0 1 0 294.8 104.1"/><path d="M200 33V181"/></g><g fill="currentColor"><path d="M906 211H981L1041 435L1108 211H1172L1239 437L1304 211H1375L1277 537H1199L1139 323L1076 537H993Z"/><path d="M1412 211H1484V537H1412Z"/><path d="M1524 211H1773V270H1681V537H1609V270H1524Z"/></g></svg>
+  </div>
+
+  <div class="hero__copy wrap" id="heroCopy">
+    <span class="chip">Innovación &amp; Tecnología</span>
+    <h1>Desarrollamos el futuro de tu empresa</h1>
+    <p class="lede">Especialistas en modernizar procesos críticos mediante Inteligencia Artificial, conectividad de alto estándar y soluciones de telemetría avanzada.</p>
+    <div class="hero__ctas">
+      <a class="btn" href="#nosotros" data-goto="nosotros">Conócenos <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+      <a class="btn btn--ghost" href="#contactanos" data-goto="contactanos">Hablemos</a>
+    </div>
+  </div>
+
+  <span class="hero__cue" aria-hidden="true"></span>
+
+  <div class="ticker" id="ticker" aria-label="Telemetría en vivo">
+    <div class="ticker__tag"><i class="dot" aria-hidden="true"></i><b>Live Telemetry</b><span>| Cono Sur</span></div>
+    <div class="ticker__track">
+      <div class="ticker__run" aria-live="off">
+        <ul>
+          <li><strong data-live="wifi">+317</strong><em>Puntos WiFi activos</em></li>
+          <li><strong data-live="pax">10.427</strong><em>Pasajeros hoy</em></li>
+          <li><strong>99.98%</strong><em>SLA Backend Elixir/AWS</em></li>
+          <li><strong>4.500 km²</strong><em>Cubiertos</em></li>
+        </ul>
+        <ul aria-hidden="true">
+          <li><strong data-live="wifi">+317</strong><em>Puntos WiFi activos</em></li>
+          <li><strong data-live="pax">10.427</strong><em>Pasajeros hoy</em></li>
+          <li><strong>99.98%</strong><em>SLA Backend Elixir/AWS</em></li>
+          <li><strong>4.500 km²</strong><em>Cubiertos</em></li>
+        </ul>
+      </div>
+    </div>
+    <button class="ticker__btn" id="tickerBtn" aria-label="Pausar telemetría" aria-pressed="false">
+      <svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="2" y="1" width="3.2" height="12"/><rect x="8.8" y="1" width="3.2" height="12"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ============ SOBRE NOSOTROS ============ -->
+<section class="about" id="nosotros" data-nav="light">
+  <div class="about__bg" id="aboutBg">
+    <picture>
+      <source media="(max-width:700px)" srcset="assets/11-cordillera-vertical.jpg">
+      <img src="assets/02-montanas.jpg" alt="" loading="lazy">
+    </picture>
+  </div>
+  <div class="about__top wrap">
+    <div class="about__text">
+      <span class="label">Sobre nosotros</span>
+      <h2 class="split">Más de 10 años impulsando la transformación digital.</h2>
+      <p class="lede">Somos una empresa de desarrollo de productos tecnológicos donde la agilidad y la innovación son el núcleo de cada solución. Nos especializamos en entender desafíos complejos para entregar herramientas simples y potentes.</p>
+    </div>
+  </div>
+  <div class="about__bottom wrap">
+    <div class="years"><b data-count="10" data-prefix="+">+10</b><span class="label">Años de<br>experiencia</span></div>
+    <div class="trait">
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M14 3c4 3 6 7.5 6 12l-2.5 4h-7L8 15c0-4.5 2-9 6-12Z"/><circle cx="14" cy="11.5" r="2.2"/><path d="M10 17l-3.5 2.5L8 23l3-2.5M18 17l3.5 2.5L20 23l-3-2.5M12.5 21.5 14 26l1.5-4.5"/></svg>
+      <div><h3>Agilidad</h3><p>Time-to-market optimizado</p></div>
+    </div>
+    <div class="trait">
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="6" cy="8" r="2.5"/><circle cx="22" cy="6" r="2.5"/><circle cx="14" cy="15" r="3.2"/><circle cx="7" cy="23" r="2.5"/><circle cx="22" cy="22" r="2.5"/><path d="M8.2 9.3 11.5 13M19.8 7.4l-3.6 5.3M8.8 21.3l3-3.6M19.9 20.4l-3.4-3.1"/></svg>
+      <div><h3>IA Avanzada</h3><p>Modelos generativos propios</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOLUCIONES: VENTANA ============ -->
+<section class="window window--right" id="soluciones" data-nav="light">
+  <div class="window__media" id="winMedia"><img id="winImg" src="assets/12-santiago-skyline.jpg" alt="Distrito financiero de Santiago con el Costanera Center y el cerro San Cristóbal" loading="lazy"></div>
+  <div class="window__copy wrap" id="winCopy">
+    <span class="chip">Ecosistema Tecnológico 2026</span>
+    <h2>Infraestructura Inteligente para el Cono Sur</h2>
+    <p class="lede">Cinco unidades de negocio integradas sobre arquitecturas distribuidas de alta concurrencia, telemetría CAN bus y edge computing.</p>
+  </div>
+</section>
+
+<!-- ============ PARADAS ============ -->
+<section class="stops" id="paradas" data-nav="light" aria-label="Unidades de negocio">
+  <div class="stops__bar" aria-hidden="true">
+    <span class="stops__count" id="stopCount">Parada 01 / 05</span>
+    <div class="route" id="route"><span class="route__fill" id="routeFill"></span></div>
+  </div>
+  <div class="stops__track" id="track">
+
+    <article class="stop" id="flotas" data-title="Gestión de Flotas">
+      <div class="stop__media"><img src="assets/13-ruta-desierto.jpg" alt="Carretera en el desierto del norte de Chile con marcador de kilómetro" loading="lazy" style="object-position:40% 50%"></div>
+      <div class="stop__body">
+        <div class="stop__tags label"><span>IoT Industrial</span><span>J1939 CAN Bus</span></div>
+        <h3>Gestión de Flotas</h3>
+        <p class="desc">Captura algorítmica de parámetros del motor en tiempo real: revoluciones, ralentí, temperatura, control de combustible y hábitos de conducción para flotas de alto tonelaje.</p>
+        <dl class="metrics">
+          <div class="metric"><dt>Ahorro combustible</dt><dd data-count="-18" data-suffix="%">-18%</dd></div>
+          <div class="metric"><dt>Transmisión</dt><dd><span data-count="1396" data-live="pkt">1.396</span><small>pkt/s</small></dd></div>
+          <div class="metric"><dt>Flotas conectadas</dt><dd><span data-count="1200" data-prefix="+">+1.200</span><small>Buses</small></dd></div>
+        </dl>
+        <div class="stop__foot"><span class="label">Pullman Bus • Las Condes • Calama</span><a class="more" href="https://wit.la/live-gps" target="_blank" rel="noopener">Explorar solución <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a></div>
+      </div>
+    </article>
+
+    <article class="stop" id="asistente" data-title="Asistente Virtual IA">
+      <div class="stop__media"><img src="assets/06-detalle-bus.jpg" alt="Detalle de la ventana y el espejo de un bus con cerros reflejados" loading="lazy"></div>
+      <div class="stop__body">
+        <div class="stop__tags label"><span>IA Cognitiva</span><span>Latencia &lt;150ms</span></div>
+        <h3>Asistente Virtual IA</h3>
+        <p class="desc">Motor conversacional de ultra-alta concurrencia desarrollado en Elixir/Erlang BEAM sobre AWS, gestionando consultas sobre pasajes, itinerarios y tracking en tiempo récord.</p>
+        <div class="chat" id="chat">
+          <div class="chat__msg chat__msg--q">¿A qué hora llega el bus Pullman 412 a Santiago?</div>
+          <div class="typing" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="chat__msg chat__msg--a"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9.5 1 3 9h4l-1 6 6.5-8h-4z"/></svg><span>El bus 412 está en Autopista Central km 42. Arribo estimado: 18:42 hrs (a tiempo).</span></div>
+        </div>
+        <div class="stop__foot"><span class="label">WhatsApp • WebChat • App</span><a class="more" href="asistente.html">Explorar solución <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a></div>
+      </div>
+    </article>
+
+    <article class="stop" id="urban-wifi" data-title="Conectividad &amp; Métricas">
+      <div class="stop__media"><img src="assets/14-santiago-aereo.jpg" alt="Vista aérea de Santiago con la cordillera nevada" loading="lazy" style="object-position:50% 40%"></div>
+      <div class="stop__body">
+        <div class="stop__tags label"><span>Urban WiFi</span><span>4.8% CTR</span></div>
+        <h3>Conectividad &amp; Métricas</h3>
+        <p class="desc">Portales cautivos para pasajeros con infraestructura MikroTik de alta densidad y monetización publicitaria programática.</p>
+        <dl class="metrics">
+          <div class="metric"><dt>Puntos activos</dt><dd data-count="317" data-prefix="+" data-live="wifi">+317</dd></div>
+          <div class="metric"><dt>Tráfico mensual</dt><dd><span data-count="2" data-dec="1">2.0</span><small>TB</small></dd></div>
+        </dl>
+        <div class="stop__foot"><span class="label">4.500 km² cubiertos</span><a class="more" href="https://wit.la/urban-wifi" target="_blank" rel="noopener">Detalles <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a></div>
+      </div>
+    </article>
+
+    <article class="stop" id="totems" data-title="Tótems &amp; Torniquetes">
+      <div class="stop__media"><img src="assets/15-totem.jpg" alt="Pasajeros usando tótems de autoservicio en un terminal" loading="lazy" style="object-position:38% 50%"></div>
+      <div class="stop__body">
+        <div class="stop__tags label"><span>Tótems &amp; P+S</span><span>-40% Filas</span></div>
+        <h3>Tótems &amp; Torniquetes</h3>
+        <p class="desc">Kioscos de autoservicio antivandálicos con torniquetes ZKTeco, validación RUT Módulo 11 e integración Transbank/Bancard.</p>
+        <dl class="metrics">
+          <div class="metric"><dt>Disponibilidad</dt><dd data-count="99.9" data-dec="1" data-suffix="%">99.9%</dd></div>
+          <div class="metric"><dt>Evasión</dt><dd>~0%</dd></div>
+        </dl>
+        <div class="stop__foot"><span class="label">Terminal Alameda</span><a class="more" href="https://wit.la/soluciones" target="_blank" rel="noopener">Detalles <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a></div>
+      </div>
+    </article>
+
+    <article class="stop" id="go-movie" data-title="Entretenimiento a Bordo">
+      <div class="stop__media"><img src="assets/10-vertical-bus.jpg" alt="Bus blanco en una carretera costera con la bahía y la cordillera" loading="lazy" style="object-position:60% 75%"></div>
+      <div class="stop__body">
+        <div class="stop__tags label"><span>Go! Movie</span><span>0 MB 4G/LTE</span></div>
+        <h3>Entretenimiento a Bordo</h3>
+        <p class="desc">Servidor multimedia autónomo para buses de larga distancia. Películas HD sin consumo de datos celulares para los pasajeros.</p>
+        <dl class="metrics">
+          <div class="metric"><dt>Catálogo HD</dt><dd><span data-count="100" data-prefix="+">+100</span><small>Horas</small></dd></div>
+          <div class="metric"><dt>Satisfacción</dt><dd><span data-count="4.9" data-dec="1">4.9</span><small>/ 5.0</small></dd></div>
+        </dl>
+        <div class="stop__foot"><span class="label">1.200+ Buses</span><a class="more" href="https://wit.la/go-movie" target="_blank" rel="noopener">Detalles <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ ATARDECER + GEMELO DIGITAL ============ -->
+<section class="dusk" id="live-gps" data-nav="dark">
+  <div class="dusk__sky" id="duskSky">
+    <img src="assets/01-carretera-costera.jpg" alt="Carretera costera hacia la ciudad y la cordillera" loading="lazy">
+    <div class="dusk__shade" id="duskShade"></div>
+    <div class="dusk__veil"></div>
+    <div class="dusk__head wrap">
+      <span class="chip">Ecosistema Digital 2026</span>
+      <h2>Gemelo Digital &amp; Telemetría Cono Sur</h2>
+      <p class="lede">Visualización 3D interactiva en tiempo real de nuestra red troncal regional y el chasis inteligente de transporte público.</p>
+    </div>
+  </div>
+
+  <div class="twin" id="twin">
+    <div class="twin__grid wrap">
+      <div class="twin__side">
+        <div class="twin__mode"><i class="dot" aria-hidden="true"></i><span><b>Modo 2D Vectorial Ligero • 0% GPU</b><br>Optimizado para máxima fluidez y eficiencia energética</span></div>
+        <div class="card" id="nodeCard" aria-live="polite">
+          <div class="card__head"><h3 id="cardCity">Santiago, Chile</h3><span class="count" id="cardCount">1240 Buses Activos</span></div>
+          <p id="cardText">Enlace telemático Elixir en tiempo real con protocolo TLS 1.3 activo.</p>
+          <span class="sla" id="cardSla">● SLA 99.98% Garantizado</span>
+          <span class="coord" id="cardCoord">33.45° S · 70.67° O</span>
+        </div>
+        <div class="twin__stats"><span>Paquetes: <b id="pkts">1.850/s</b></span><span>Latencia: <b>&lt; 14ms</b></span><span>SLA: <b>99.98%</b></span></div>
+        <p class="twin__hint">Haz clic en cualquier nodo o subsistema para abrir la telemetría detallada.</p>
+      </div>
+      <div class="map" id="map">
+        <canvas id="mapDots" aria-hidden="true"></canvas>
+        <svg id="mapSvg" viewBox="0 0 784 860" role="group" aria-label="Mapa de la red troncal del Cono Sur"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLIENTES ============ -->
+<section class="clients" id="proyectos" data-nav="dark">
+  <div class="wrap">
+    <div class="clients__head"><span class="label">Empresas que confían en nosotros</span></div>
+  </div>
+  <div class="marq" aria-label="Clientes">
+    <div class="marq__run">
+      <ul><li>Metro de Santiago</li><li>Arauco</li><li>Pullman Bus</li><li>Mutual</li><li>Claro</li><li>Transantiago</li></ul>
+      <ul aria-hidden="true"><li>Metro de Santiago</li><li>Arauco</li><li>Pullman Bus</li><li>Mutual</li><li>Claro</li><li>Transantiago</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LLEGADA / CTA ============ -->
+<section class="arrive" id="contactanos" data-nav="dark">
+  <div class="arrive__media" id="arriveMedia"><img src="assets/07-atardecer.jpg" alt="Carretera de noche con estelas de luz sobre la ciudad iluminada" loading="lazy"></div>
+  <div class="arrive__copy wrap" id="arriveCopy">
+    <h2>¿Tienes un desafío tecnológico?</h2>
+    <p class="lede">Nuestro equipo de ingenieros está listo para convertir tu idea en una solución escalable.</p>
+    <a class="btn btn--light" href="#contacto" data-goto="contacto">Iniciar proyecto <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h11M9 4l4 4-4 4"/></svg></a>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot" id="contacto" data-nav="dark">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div class="foot__brand">
+        <svg viewBox="390 118 1390 480" role="img" aria-label="WIT"><g transform="translate(397 124) scale(1.04)" fill="none" stroke="currentColor" stroke-width="52" stroke-linecap="round"><path d="M105.2 104.1A174 174 0 1 0 294.8 104.1"/><path d="M200 33V181"/></g><g fill="currentColor"><path d="M906 211H981L1041 435L1108 211H1172L1239 437L1304 211H1375L1277 537H1199L1139 323L1076 537H993Z"/><path d="M1412 211H1484V537H1412Z"/><path d="M1524 211H1773V270H1681V537H1609V270H1524Z"/></g></svg>
+        <h2>WIT Innovación y Tecnología</h2>
+        <p>Desarrollamos soluciones tecnológicas que transforman negocios y conectan personas a través de la innovación constante.</p>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <ul>
+          <li><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M9 16s5.5-5 5.5-9A5.5 5.5 0 0 0 3.5 7c0 4 5.5 9 5.5 9Z"/><circle cx="9" cy="7" r="2"/></svg><span>Los Conquistadores 1700, piso 8, oficina 802C,<br>Providencia, Santiago, Chile</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M4 2h3l1.5 4-2 1.2a9 9 0 0 0 4.3 4.3L12 9.5l4 1.5v3a2 2 0 0 1-2 2A13 13 0 0 1 2 4a2 2 0 0 1 2-2Z"/></svg><span>Casa Matriz: <span class="sel">+56 9 9848 1845</span></span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="2" y="4" width="14" height="10" rx="1"/><path d="m2.5 4.5 6.5 5 6.5-5"/></svg><span><a class="sel" href="mailto:contacto@wit.la">contacto@wit.la</a></span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Legal</h3>
+        <ul class="legal">
+          <li><a href="#contacto">Política de Privacidad</a></li>
+          <li><a href="#contacto">Términos de Servicio</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__base">
+      <span>Copyright © 2021–2026 WIT SpA</span>
+      <nav aria-label="Redes">
+        <a href="https://cl.linkedin.com/company/wit-innovacion-y-tecnologia" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="4" r="2"/><circle cx="4" cy="8" r="2"/><circle cx="12" cy="12" r="2"/><path d="m5.8 7 4.4-2M5.8 9l4.4 2"/></svg>LinkedIn</a>
+        <a href="#inicio" data-goto="inicio"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4.2 2.8 6.5S10 12.5 8 14.5M8 1.5C6 3.5 5.2 5.7 5.2 8S6 12.5 8 14.5"/></svg>ES</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasGsap = !!(window.gsap && window.ScrollTrigger);
+  const fmt = (v, dec = 0) => {
+    const neg = v < 0; v = Math.abs(v);
+    let s = dec ? v.toFixed(dec) : Math.round(v).toString();
+    if (!dec) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (neg ? '-' : '') + s;
+  };
+
+  /* ---------- Nav: si los links no caben, pasa a menú ---------- */
+  const navEl = $('#nav'), navIn = $('.nav__in', navEl), links = $('.nav__links', navEl);
+  const fitNav = () => {
+    navEl.classList.remove('nav--compact');
+    if (getComputedStyle(links).display === 'none') return;
+    const free = navIn.clientWidth - parseFloat(getComputedStyle(navIn).paddingLeft) - parseFloat(getComputedStyle(navIn).paddingRight) - 30 - 32;
+    if (links.scrollWidth > free) navEl.classList.add('nav--compact');
+  };
+  fitNav(); addEventListener('resize', fitNav);
+  document.fonts && document.fonts.ready.then(fitNav);
+
+  /* ---------- Menú móvil ---------- */
+  const sheet = $('#sheet'), menuBtn = $('#menuBtn');
+  const openSheet = (o) => { sheet.hidden = !o; menuBtn.setAttribute('aria-expanded', o); document.documentElement.style.overflow = o ? 'hidden' : ''; if (lenis) o ? lenis.stop() : lenis.start(); };
+  menuBtn.addEventListener('click', () => openSheet(true));
+  $('#sheetClose').addEventListener('click', () => openSheet(false));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) openSheet(false); });
+
+  /* ---------- Huincha ---------- */
+  const ticker = $('#ticker'), tBtn = $('#tickerBtn');
+  tBtn.addEventListener('click', () => {
+    const p = ticker.classList.toggle('is-paused');
+    tBtn.setAttribute('aria-pressed', p);
+    tBtn.setAttribute('aria-label', p ? 'Reanudar telemetría' : 'Pausar telemetría');
+    tBtn.innerHTML = p ? '<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.5v11L12.5 7z"/></svg>' : '<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="2" y="1" width="3.2" height="12"/><rect x="8.8" y="1" width="3.2" height="12"/></svg>';
+  });
+
+  /* Cifras vivas: pequeñas variaciones, como la telemetría real */
+  const live = { wifi: 317, pax: 10427, pkt: 1396, pk: 1850 };
+  setInterval(() => {
+    if (ticker.classList.contains('is-paused')) return;
+    live.pax += Math.floor(Math.random() * 4);
+    if (Math.random() < .15) live.wifi = 317 + Math.floor(Math.random() * 2);
+    live.pkt = 1380 + Math.floor(Math.random() * 45);
+    live.pk = 1820 + Math.floor(Math.random() * 60);
+    $$('[data-live="pax"]').forEach(e => e.textContent = fmt(live.pax));
+    $$('[data-live="wifi"]').forEach(e => { if (!e.dataset.busy) e.textContent = '+' + live.wifi; });
+    $$('[data-live="pkt"]').forEach(e => { if (!e.dataset.busy) e.textContent = fmt(live.pkt); });
+    $('#pkts').textContent = fmt(live.pk) + '/s';
+  }, 1600);
+
+  /* ---------- Mapa del Cono Sur ---------- */
+  const LON0 = -76, LON1 = -54, LAT0 = -16.5, LAT1 = -38, K = 40, CX = Math.cos(27 * Math.PI / 180);
+  const px = (lat, lon) => [(lon - LON0) * K * CX, (LAT0 - lat) * K];
+  const coast = [[-16.5,-72.8],[-17,-71.9],[-17.65,-71.35],[-18,-70.9],[-18.48,-70.33],[-19,-70.28],[-19.6,-70.2],[-20.21,-70.15],[-21,-70.2],[-21.6,-70.1],[-22.09,-70.21],[-22.9,-70.28],[-23.45,-70.6],[-23.65,-70.4],[-24.3,-70.55],[-25.4,-70.48],[-26.35,-70.65],[-27.07,-70.83],[-28,-71.15],[-28.47,-71.22],[-29.3,-71.35],[-29.9,-71.25],[-30.6,-71.7],[-31.9,-71.52],[-32.75,-71.5],[-33.05,-71.62],[-33.6,-71.62],[-34.4,-72],[-35.33,-72.41],[-36,-72.75],[-36.8,-73.15],[-37.3,-73.6],[-37.6,-73.65],[-38,-73.5]];
+  const coastLon = lat => { for (let i = 0; i < coast.length - 1; i++) { const [a, b] = [coast[i], coast[i + 1]]; if (lat <= a[0] && lat >= b[0]) { const t = (lat - a[0]) / (b[0] - a[0]); return a[1] + t * (b[1] - a[1]); } } return -73; };
+  const isLand = (lat, lon) => lon > coastLon(lat) && !(lat < -34.3 && lon > -58.5);
+
+  const nodes = [
+    { id:'santiago', city:'Santiago', country:'Chile', lat:-33.45, lon:-70.67, buses:1240, sub:'99.98% SLA', text:'Enlace telemático Elixir en tiempo real con protocolo TLS 1.3 activo.', sla:'● SLA 99.98% Garantizado', lx:-16, ly:5, anchor:'end' },
+    { id:'lascondes', city:'Las Condes', country:'Chile', lat:-34.35, lon:-69.2, real:[-33.41,-70.58], buses:180, sub:'Electromovilidad', lx:14, ly:16, anchor:'start' },
+    { id:'antofagasta', city:'Antofagasta', country:'Chile', lat:-23.65, lon:-70.4, buses:310, sub:'Rutas Mineras', lx:-16, ly:5, anchor:'end' },
+    { id:'calama', city:'Calama', country:'Chile', lat:-22.46, lon:-68.93, buses:140, sub:'Terminal El Loa', lx:16, ly:5, anchor:'start' },
+    { id:'iquique', city:'Iquique', country:'Chile', lat:-20.21, lon:-70.15, buses:220, sub:'ZOFRI Port', lx:-16, ly:5, anchor:'end' },
+    { id:'mendoza', city:'Mendoza', country:'Argentina', lat:-32.89, lon:-68.83, buses:290, sub:'Paso Los Libertadores', lx:16, ly:-6, anchor:'start' },
+    { id:'asuncion', city:'Asunción', country:'Paraguay', lat:-25.28, lon:-57.63, buses:380, sub:'Bancard Gateway', lx:-16, ly:5, anchor:'end' },
+  ];
+  const coordTxt = (lat, lon) => `${Math.abs(lat).toFixed(2)}° S · ${Math.abs(lon).toFixed(2)}° O`;
+
+  function drawDots() {
+    const c = $('#mapDots'), r = c.getBoundingClientRect(); if (!r.width) return;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    c.width = r.width * dpr; c.height = r.height * dpr;
+    const g = c.getContext('2d'), s = r.width / 784 * dpr;
+    g.clearRect(0, 0, c.width, c.height);
+    const step = .42;
+    for (let lat = LAT0 - .2; lat > LAT1; lat -= step) for (let lon = LON0 + .2; lon < LON1; lon += step / CX * .98) {
+      if (!isLand(lat, lon)) continue;
+      const [x, y] = px(lat, lon);
+      const edge = lon - coastLon(lat) < .9;
+      g.fillStyle = edge ? 'rgba(255,255,255,.42)' : 'rgba(255,255,255,.17)';
+      g.beginPath(); g.arc(x * s, y * s, 1.35 * s, 0, 6.283); g.fill();
+    }
+  }
+
+  const svg = $('#mapSvg'), NS = 'http://www.w3.org/2000/svg';
+  const el = (t, a = {}, p = svg) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+  // retícula de latitud y longitud
+  [-20, -25, -30, -35].forEach(lat => { const [, y] = px(lat, 0); el('line', { x1: 0, x2: 784, y1: y, y2: y, class: 'grat' }); el('text', { x: 6, y: y - 6, class: 'grat-l' }).textContent = `${-lat}°S`; });
+  [-70, -65, -60].forEach(lon => { const [x] = px(0, lon); el('line', { x1: x, x2: x, y1: 0, y2: 860, class: 'grat' }); el('text', { x: x + 6, y: 852, class: 'grat-l' }).textContent = `${-lon}°O`; });
+  const hub = nodes[0], [hx, hy] = px(hub.lat, hub.lon);
+  const routes = {};
+  nodes.slice(1).forEach(n => {
+    const [x, y] = px(n.lat, n.lon);
+    const mx = (hx + x) / 2, my = (hy + y) / 2, dx = x - hx, dy = y - hy, len = Math.hypot(dx, dy) || 1;
+    const bend = Math.min(90, len * .22);
+    const cx = mx + (-dy / len) * bend * (n.lon > hub.lon ? -1 : 1), cy = my + (dx / len) * bend * (n.lon > hub.lon ? -1 : 1);
+    routes[n.id] = el('path', { d: `M${hx} ${hy}Q${cx} ${cy} ${x} ${y}`, class: 'rt' });
+  });
+  const nodeEls = {};
+  nodes.forEach(n => {
+    const [x, y] = px(n.lat, n.lon);
+    const g = el('g', { class: 'node', tabindex: 0, role: 'button', 'aria-label': `${n.city}, ${n.country}: ${n.buses} buses, ${n.sub}`, 'data-id': n.id });
+    el('circle', { cx: x, cy: y, r: 6, class: 'pulse' }, g);
+    el('circle', { cx: x, cy: y, r: n.id === 'santiago' ? 13 : 10, class: 'halo' }, g);
+    el('circle', { cx: x, cy: y, r: n.id === 'santiago' ? 4.5 : 3.5, class: 'core' }, g);
+    el('text', { x: x + n.lx, y: y + n.ly, 'text-anchor': n.anchor }, g).textContent = n.city;
+    el('text', { x: x + n.lx, y: y + n.ly + 15, 'text-anchor': n.anchor, class: 'sub' }, g).textContent = `${n.buses} buses · ${n.sub}`;
+    el('circle', { cx: x, cy: y, r: 22, fill: 'transparent' }, g);
+    g.addEventListener('click', () => select(n.id));
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(n.id); } });
+    nodeEls[n.id] = g;
+  });
+  function select(id) {
+    const n = nodes.find(v => v.id === id);
+    Object.values(nodeEls).forEach(g => g.classList.toggle('is-sel', g.dataset.id === id));
+    Object.entries(routes).forEach(([k, p]) => p.classList.toggle('is-sel', k === id));
+    $('#cardCity').textContent = `${n.city}, ${n.country}`;
+    $('#cardCount').textContent = `${n.buses} Buses Activos`;
+    $('#cardText').textContent = n.text || n.sub;
+    $('#cardSla').hidden = !n.sla;
+    const [la, lo] = n.real || [n.lat, n.lon];
+    $('#cardCoord').textContent = coordTxt(la, lo);
+  }
+  select('santiago');
+  drawDots();
+  addEventListener('resize', () => requestAnimationFrame(drawDots));
+  document.fonts && document.fonts.ready.then(drawDots);
+
+  /* ---------- Contadores ---------- */
+  function countUp(root) {
+    $$('[data-count]', root).forEach(e => {
+      if (e.dataset.done) return; e.dataset.done = 1;
+      const to = parseFloat(e.dataset.count), dec = +(e.dataset.dec || 0), pre = e.dataset.prefix || '', suf = e.dataset.suffix || '';
+      if (reduce || !hasGsap) return;
+      const o = { v: 0 }; e.dataset.busy = 1;
+      gsap.to(o, { v: to, duration: 1.6, ease: 'power3.out', onUpdate: () => e.textContent = pre + fmt(o.v, dec) + suf, onComplete: () => delete e.dataset.busy });
+    });
+  }
+  function playChat() {
+    const chat = $('#chat'); if (chat.dataset.done || reduce || !hasGsap) return; chat.dataset.done = 1;
+    const a = $('.chat__msg--a', chat), t = $('.typing', chat);
+    gsap.set(a, { display: 'none' }); t.style.display = 'flex';
+    gsap.fromTo(t, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3, delay: .3 });
+    gsap.delayedCall(1.6, () => { t.style.display = 'none'; gsap.set(a, { display: 'flex' }); gsap.from(a, { opacity: 0, y: 10, duration: .5, ease: 'power2.out' }); });
+  }
+
+  /* ---------- Sin GSAP o con movimiento reducido: página quieta y completa ---------- */
+  const nav = $('#nav');
+  let lenis = null;
+  const goTo = (id) => {
+    const t = document.getElementById(id); if (!t) return;
+    let y;
+    if (stopTargets[id] != null) y = stopTargets[id]();
+    else y = t.getBoundingClientRect().top + scrollY;
+    if (id === 'live-gps' && twinST) y = twinST.end - 2;
+    if (lenis) lenis.scrollTo(y, { duration: 1.8, easing: t => 1 - Math.pow(1 - t, 4) });
+    else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+  };
+  const stopTargets = {};
+  let twinST = null;
+  $$('[data-goto]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (!sheet.hidden) openSheet(false); goTo(a.dataset.goto); }));
+
+  function navState(mode) {
+    nav.classList.toggle('nav--light', mode === 'light');
+    nav.classList.toggle('nav--dark', mode === 'dark');
+  }
+  const setActive = id => $$('.nav__links a').forEach(a => a.classList.toggle('is-active', a.dataset.link === id));
+
+  if (!hasGsap || reduce) {
+    document.documentElement.classList.add('static');
+    $$('[data-count]').forEach(e => e.dataset.done = 1);
+    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { navState(en.target.dataset.nav); } }), { rootMargin: '-38px 0px -95% 0px' });
+    $$('[data-nav]').forEach(s => io.observe(s));
+    addEventListener('scroll', () => nav.classList.toggle('nav--solid', scrollY > 40), { passive: true });
+    return;
+  }
+
+  /* ---------- Movimiento ---------- */
+  gsap.registerPlugin(ScrollTrigger);
+  if (window.Lenis) {
+    lenis = new Lenis({ lerp: .085, wheelMultiplier: .95 });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+  }
+
+  ScrollTrigger.create({ start: 0, end: 'max', onUpdate: self => nav.classList.toggle('nav--solid', self.scroll() > innerHeight * 1.2) });
+
+  // Hero: el logo se despide, la foto se acerca y aparece el mensaje
+  const heroTl = gsap.timeline({ scrollTrigger: { trigger: '#inicio', start: 'top top', end: '+=130%', pin: true, scrub: .8, anticipatePin: 1 } });
+  heroTl
+    .fromTo('.hero__media img', { scale: 1.14 }, { scale: 1, ease: 'none', duration: 2.2 }, 0)
+    .to('.hero__logo', { yPercent: -70, opacity: 0, scale: .86, filter: 'blur(8px)', ease: 'power1.in', duration: 1 }, 0)
+    .to('.hero__cue', { opacity: 0, duration: .3 }, 0)
+    .from('#heroCopy > *', { y: 46, opacity: 0, stagger: .14, duration: .8, ease: 'power2.out' }, .85)
+    .to({}, { duration: .5 });
+
+  // Sobre nosotros: la sección sube sobre el hero y el fondo viaja más lento
+  gsap.fromTo('#aboutBg', { yPercent: -6 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '#nosotros', start: 'top bottom', end: 'bottom top', scrub: true } });
+  // titular por palabras
+  $$('.split').forEach(h => {
+    h.innerHTML = h.textContent.split(' ').map(w => `<span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.16em;margin-bottom:-.16em"><span style="display:inline-block">${w}</span></span>`).join(' ');
+    gsap.from($$('span > span', h), { yPercent: 105, duration: 1, ease: 'power3.out', stagger: .05, scrollTrigger: { trigger: h, start: 'top 82%' } });
+  });
+  gsap.from('#nosotros .about__text .lede, #nosotros .about__text .label', { y: 24, opacity: 0, duration: .9, stagger: .1, ease: 'power2.out', scrollTrigger: { trigger: '#nosotros .about__text', start: 'top 75%' } });
+  gsap.from('.about__bottom > *', { y: 40, opacity: 0, duration: 1, stagger: .12, ease: 'power2.out', scrollTrigger: { trigger: '.about__bottom', start: 'top 85%', onEnter: () => countUp($('.about__bottom')) } });
+
+  const mm = gsap.matchMedia();
+
+  // Soluciones: la ventana se abre al paisaje
+  mm.add('(min-width: 900px)', () => {
+    const tl = gsap.timeline({ scrollTrigger: { trigger: '#soluciones', start: 'top top', end: '+=110%', pin: true, scrub: .8 } });
+    tl.fromTo('#winMedia', { clipPath: 'inset(16% 26% 16% 26%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'power2.inOut', duration: 1 }, 0)
+      .fromTo('#winImg', { scale: 1.3 }, { scale: 1, ease: 'power2.inOut', duration: 1 }, 0)
+      .from('#winCopy > *', { y: 50, opacity: 0, stagger: .12, duration: .5, ease: 'power2.out' }, .55)
+      .to({}, { duration: .35 });
+  });
+  mm.add('(max-width: 899px)', () => {
+    gsap.fromTo('#winImg', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '#soluciones', start: 'top bottom', end: 'bottom top', scrub: true } });
+    gsap.from('#winCopy > *', { y: 30, opacity: 0, stagger: .1, duration: .8, scrollTrigger: { trigger: '#soluciones', start: 'top 60%' } });
+  });
+
+  // Paradas: el recorrido horizontal
+  const stops = $$('.stop'), route = $('#route'), fill = $('#routeFill'), count = $('#stopCount');
+  stops.forEach((s, i) => { const d = document.createElement('span'); d.className = 'route__stop'; d.style.left = (i / (stops.length - 1) * 100) + '%'; route.appendChild(d); });
+  const dots = $$('.route__stop');
+  const activate = (s) => { if (s.dataset.on) return; s.dataset.on = 1; countUp(s); if (s.id === 'asistente') playChat(); };
+
+  mm.add('(min-width: 900px)', () => {
+    const track = $('#track');
+    const dist = () => track.scrollWidth - innerWidth;
+    const tween = gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: {
+      trigger: '#paradas', start: 'top top', end: () => '+=' + dist() * 1.05, pin: true, scrub: .9, invalidateOnRefresh: true,
+      onUpdate: self => {
+        const p = self.progress, idx = Math.round(p * (stops.length - 1));
+        fill.style.transform = `scaleX(${p})`;
+        dots.forEach((d, i) => d.classList.toggle('is-on', i <= idx));
+        count.textContent = `Parada 0${idx + 1} / 0${stops.length} · ${stops[idx].dataset.title.replace('&amp;', '&')}`;
+      }
+    } });
+    const st = tween.scrollTrigger;
+    const snapEnd = () => {
+      if (!st.isActive || !lenis) return;
+      const n = stops.length - 1, span = st.end - st.start, p = (lenis.scroll - st.start) / span;
+      const target = st.start + span * Math.round(p * n) / n;
+      if (Math.abs(target - lenis.scroll) > 6) lenis.scrollTo(target, { duration: .9, easing: t => 1 - Math.pow(1 - t, 3) });
+    };
+    ScrollTrigger.addEventListener('scrollEnd', snapEnd);
+    stops.forEach((s, i) => {
+      stopTargets[s.id] = () => st.start + (st.end - st.start) * (i / (stops.length - 1));
+      gsap.fromTo($('.stop__media img', s), { xPercent: -6 }, { xPercent: 6, ease: 'none', scrollTrigger: { trigger: s, containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
+      const st0 = i === 0 ? { trigger: '#paradas', start: 'top 70%', onEnter: () => activate(s) } : { trigger: s, containerAnimation: tween, start: 'left 55%', onEnter: () => activate(s) };
+      gsap.from($$('.stop__body > *', s), { y: 36, opacity: 0, stagger: .08, duration: .8, ease: 'power2.out', immediateRender: false, scrollTrigger: st0 });
+    });
+    activate(stops[0]);
+    return () => { ScrollTrigger.removeEventListener('scrollEnd', snapEnd); stops.forEach(s => delete stopTargets[s.id]); };
+  });
+  mm.add('(max-width: 899px)', () => {
+    stops.forEach(s => {
+      gsap.fromTo($('.stop__media img', s), { yPercent: -5 }, { yPercent: 5, ease: 'none', scrollTrigger: { trigger: s, start: 'top bottom', end: 'bottom top', scrub: true } });
+      gsap.from($$('.stop__body > *', s), { y: 28, opacity: 0, stagger: .07, duration: .7, scrollTrigger: { trigger: $('.stop__body', s), start: 'top 82%', onEnter: () => activate(s) } });
+    });
+  });
+
+  // Atardecer: el cielo se oscurece mientras bajamos
+  gsap.fromTo('#duskSky img', { yPercent: -6, scale: 1.08 }, { yPercent: 6, scale: 1, ease: 'none', scrollTrigger: { trigger: '#duskSky', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.fromTo('#duskShade', { opacity: 0 }, { opacity: .55, ease: 'none', scrollTrigger: { trigger: '#duskSky', start: 'top 60%', end: 'bottom 40%', scrub: true } });
+  gsap.from('.dusk__head > *', { y: 40, opacity: 0, stagger: .12, duration: 1, ease: 'power2.out', scrollTrigger: { trigger: '.dusk__head', start: 'top 85%' } });
+
+  // Gemelo digital: la red se enciende nodo a nodo
+  const order = ['santiago', 'lascondes', 'mendoza', 'antofagasta', 'calama', 'iquique', 'asuncion'];
+  const buildNet = () => {
+    const tl = gsap.timeline({ paused: true });
+    tl.from('#mapDots', { opacity: 0, duration: .6 }, 0);
+    order.forEach((id, i) => {
+      const at = .3 + i * .32;
+      if (routes[id]) { const L = routes[id].getTotalLength(); tl.fromTo(routes[id], { strokeDashoffset: L, strokeDasharray: `${L} ${L}` }, { strokeDashoffset: 0, duration: .45, ease: 'power1.inOut', onComplete: () => routes[id].removeAttribute('style') }, at - .2); }
+      tl.from(nodeEls[id], { opacity: 0, scale: .2, transformOrigin: '50% 50%', duration: .35, ease: 'back.out(2)' }, at);
+    });
+    return tl;
+  };
+  mm.add('(min-width: 900px)', () => {
+    const net = buildNet();
+    const st = ScrollTrigger.create({ trigger: '#twin', start: 'top top', end: '+=90%', pin: true, scrub: .6, animation: net });
+    twinST = st;
+    gsap.from('.twin__side > *', { y: 30, opacity: 0, stagger: .1, duration: .8, scrollTrigger: { trigger: '#twin', start: 'top 70%' } });
+    return () => { twinST = null; };
+  });
+  mm.add('(max-width: 899px)', () => {
+    const net = buildNet();
+    ScrollTrigger.create({ trigger: '#map', start: 'top 75%', once: true, onEnter: () => net.duration(3).play() });
+  });
+
+  // Llegada
+  gsap.fromTo('#arriveMedia', { yPercent: -8 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '#contactanos', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.from('#arriveCopy > *', { y: 50, opacity: 0, stagger: .14, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '#arriveCopy', start: 'top 80%' } });
+
+  // estado del nav según la sección bajo él
+  $$('[data-nav]').forEach(s => ScrollTrigger.create({
+    trigger: s, start: 'top 38px', end: 'bottom 38px',
+    onToggle: self => { if (self.isActive) navState(s.dataset.nav); }
+  }));
+
+
+  addEventListener('load', () => {
+    ScrollTrigger.refresh();
+    const h = location.hash.slice(1);
+    if (h && document.getElementById(h)) setTimeout(() => goTo(h), 120);
+  });
+})();
+</script>
+</body>
+</html>
